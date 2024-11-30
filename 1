@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test di Consapevolezza Finanziaria</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .question {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .options {
+            margin-top: 10px;
+        }
+        .option {
+            margin: 10px 0;
+        }
+        .result {
+            display: none;
+            background-color: #e8f4f8;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test di Consapevolezza Finanziaria</h1>
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+    </div>
+    <form id="surveyForm">
+        <div id="questions"></div>
+        <button type="submit">Calcola Risultato</button>
+    </form>
+    <div id="result" class="result"></div>
+
+    <script>
+        const questions = [
+            {
+                question: "Qual è il principale fattore che influenza la capacità di una persona di godere della propria ricchezza nel tempo?",
+                options: [
+                    "Il tasso di inflazione",
+                    "La salute fisica e mentale",
+                    "La volatilità del mercato azionario"
+                ],
+                correct: 1
+            },
+            {
+                question: "Secondo il modello \"Die with Zero\", qual è l'approccio migliore per gestire il proprio denaro?",
+                options: [
+                    "Risparmiare il più possibile per lasciare un'eredità consistente",
+                    "Investire aggressivamente per massimizzare i profitti a breve termine",
+                    "Vivere esperienze significative e distribuire la propria ricchezza durante la vita"
+                ],
+                correct: 2
+            },
+            {
+                question: "Quale dei seguenti bias cognitivi può portare a continuare un investimento in perdita solo perché si è già speso molto per acquistarlo?",
+                options: [
+                    "Ancoraggio",
+                    "Costo irrecuperabile",
+                    "Prospettiva temporale"
+                ],
+                correct: 1
+            },
+            {
+                question: "Secondo gli studi citati nelle fonti, cosa aumenta maggiormente la soddisfazione personale?",
+                options: [
+                    "Acquistare beni materiali costosi",
+                    "Spendere denaro per esperienze personali e per gli altri",
+                    "Ottenere un aumento di stipendio significativo"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa si intende per \"Termostato Finanziario\"?",
+                options: [
+                    "Un indicatore del livello di rischio che una persona è disposta a correre nei propri investimenti",
+                    "Un limite mentale inconscio che determina quanto denaro una persona si sente \"autorizzata\" a possedere",
+                    "Un metodo di budgeting che aiuta a monitorare le entrate e le uscite mensili"
+                ],
+                correct: 1
+            },
+            {
+                question: "Quale delle seguenti azioni NON è consigliata per alzare il proprio Termostato Finanziario?",
+                options: [
+                    "Frequentare persone di successo che hanno raggiunto la libertà finanziaria",
+                    "Continuare a fare un lavoro che non piace solo perché si è investito molto tempo in quel settore",
+                    "Settare obiettivi finanziari ambiziosi e misurabili"
+                ],
+                correct: 1
+            },
+            {
+                question: "Perché è importante calcolare il costo di un acquisto in ore di vita lavorativa?",
+                options: [
+                    "Per valutare se il prezzo è competitivo rispetto ad altri prodotti simili",
+                    "Per comprendere il vero valore del proprio tempo e fare acquisti più consapevoli",
+                    "Per tenere traccia delle proprie spese e creare un budget mensile dettagliato"
+                ],
+                correct: 1
+            },
+            {
+                question: "Quale delle seguenti affermazioni NON è vera riguardo ai bias cognitivi?",
+                options: [
+                    "Influenzano le nostre decisioni in modo inconscio",
+                    "Possono essere completamente eliminati con la giusta consapevolezza",
+                    "Spesso ci portano a prendere decisioni non ottimali"
+                ],
+                correct: 1
+            },
+            {
+                question: "Secondo il modello del \"Secchio del Tempo\", come si dovrebbe organizzare la propria vita?",
+                options: [
+                    "Pianificando esperienze significative da vivere in diversi periodi della propria vita",
+                    "Risparmiando aggressivamente per raggiungere la libertà finanziaria il prima possibile",
+                    "Concentrandosi sulla carriera lavorativa per massimizzare il guadagno"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'errore comune che le persone fanno quando ricevono un'eredità?",
+                options: [
+                    "Investirla in modo troppo conservativo, perdendo potenziali guadagni",
+                    "Spenderla in modo impulsivo, senza un piano a lungo termine",
+                    "Entrambe le opzioni precedenti"
+                ],
+                correct: 2
+            },
+            {
+                question: "Quale dei seguenti NON è un buon indicatore per valutare il proprio Termostato Finanziario?",
+                options: [
+                    "Il saldo del proprio conto corrente",
+                    "Il livello di ricchezza delle persone che si frequentano abitualmente",
+                    "Il numero di beni materiali di lusso posseduti"
+                ],
+                correct: 2
+            },
+            {
+                question: "Quale atteggiamento mentale è utile per raggiungere la libertà finanziaria?",
+                options: [
+                    "Essere soddisfatti del proprio livello di reddito attuale",
+                    "Credere che la ricchezza sia riservata a pochi fortunati",
+                    "Essere disposti a uscire dalla propria zona di comfort e sfidare i propri limiti"
+                ],
+                correct: 2
+            },
+            {
+                question: "Qual è la principale differenza tra il modello \"Die with Zero\" e il tradizionale modello di pianificazione finanziaria?",
+                options: [
+                    "\"Die with Zero\" incoraggia a spendere tutto il proprio denaro prima di morire, mentre il modello tradizionale si concentra sul risparmio",
+                    "\"Die with Zero\" si concentra sul valore delle esperienze durante la vita, mentre il modello tradizionale si basa sul raggiungimento di un determinato patrimonio netto",
+                    "Non ci sono differenze sostanziali, entrambi i modelli mirano a massimizzare la felicità e la sicurezza finanziaria"
+                ],
+                correct: 1
+            },
+            {
+                question: "Perché è importante avere un obiettivo finanziario ambizioso?",
+                options: [
+                    "Perché aumenta la motivazione e spinge a impegnarsi maggiormente",
+                    "Perché garantisce di raggiungere la libertà finanziaria in tempi brevi",
+                    "Perché permette di impressionare gli altri con i propri successi economici"
+                ],
+                correct: 0
+            },
+            {
+                question: "Quale dei seguenti bias cognitivi può portare a non chiedere un aumento di stipendio, pur meritandolo?",
+                options: [
+                    "Avversione alla perdita",
+                    "Contabilità mentale",
+                    "Prospettiva temporale"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa accade al benessere emotivo di una persona quando il suo reddito annuo supera i 75.000 euro?",
+                options: [
+                    "Continua ad aumentare proporzionalmente all'aumento del reddito",
+                    "Diminuisce rapidamente, portando a insoddisfazione e stress",
+                    "Gli effetti dell'aumento del reddito sul benessere emotivo diventano insignificanti"
+                ],
+                correct: 2
+            },
+            {
+                question: "Cosa si intende per \"rinvio della gratificazione\"?",
+                options: [
+                    "Procrastinare un compito importante per dedicarsi ad attività più piacevoli",
+                    "Resistere alla tentazione di una ricompensa immediata per ottenere un beneficio maggiore in futuro",
+                    "Spendere denaro in modo impulsivo per soddisfare i propri desideri immediati"
+                ],
+                correct: 1
+            },
+            {
+                question: "Come si può contrastare l'effetto dei bias cognitivi sulle proprie decisioni finanziarie?",
+                options: [
+                    "Ignorandoli, in quanto non hanno un impatto reale sul nostro comportamento",
+                    "Essere consapevoli della loro esistenza e analizzare le proprie decisioni in modo critico",
+                    "Affidandosi completamente ai consigli di un esperto finanziario"
+                ],
+                correct: 1
+            },
+            {
+                question: "Quale delle seguenti NON è una buona ragione per spendere denaro per gli altri?",
+                options: [
+                    "Aumenta la propria felicità e soddisfazione personale",
+                    "Permette di creare relazioni più forti e significative",
+                    "Per sentirsi superiori e ostentare la propria ricchezza"
+                ],
+                correct: 2
+            },
+            {
+                question: "Perché è importante \"morire con zero\", secondo il modello di Perkins?",
+                options: [
+                    "Perché il denaro non ha valore dopo la morte",
+                    "Per evitare di lasciare un'eredità che potrebbe creare conflitti familiari",
+                    "Per massimizzare le proprie esperienze di vita e distribuire la propria ricchezza in modo significativo"
+                ],
+                correct: 2
+            }
+        ];
+
+        const correctAnswers = [1,2,1,1,1,1,1,1,0,2,2,2,1,0,0,2,1,1,2,2];
+
+        function createQuestions() {
+            const container = document.getElementById('questions');
+            questions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question';
+                div.innerHTML = `
+                    <p><strong>Domanda ${index + 1}:</strong> ${q.question}</p>
+                    <div class="options">
+                        ${q.options.map((option, i) => `
+                            <div class="option">
+                                <input type="radio" name="q${index}" value="${i}" required>
+                                <label>${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function calculateScore() {
+            let score = 0;
+            questions.forEach((_, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === correctAnswers[index]) {
+                    score++;
+                }
+            });
+            return (score / questions.length) * 100;
+        }
+
+        function getCategory(score) {
+            if (score === 0) return "Categoria Speciale 1";
+            if (score === 100) return "Categoria Speciale 2";
+            if (score <= 25) return "Categoria 1";
+            if (score <= 50) return "Categoria 2";
+            if (score <= 75) return "Categoria 3";
+            return "Categoria 4";
+        }
+
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const score = calculateScore();
+            const category = getCategory(score);
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h2>Risultato del Test</h2>
+                <p>Punteggio: ${score.toFixed(1)}%</p>
+                <p>Categoria: ${category}</p>
+                <h3>Suggerimenti per il miglioramento:</h3>
+                <p>${getSuggestions(category)}</p>
+            `;
+            
+            // Invia i risultati a Google Sheets
+            submitToGoogleSheets(score, category);
+        });
+
+        function getSuggestions(category) {
+            const suggestions = {
+                "Categoria Speciale 1": "Inizia con materiali introduttivi sulla gestione finanziaria e concentrati sulla comprensione dei concetti base.",
+                "Categoria 1": "Approfondisci i bias cognitivi e l'importanza delle esperienze nella gestione finanziaria.",
+                "Categoria 2": "Concentrati su 'Die with Zero' e 'Termostato Finanziario'. Sviluppa una comprensione più profonda dei principi finanziari.",
+                "Categoria 3": "Metti in pratica i principi appresi e inizia a impostare obiettivi finanziari ambiziosi.",
+                "Categoria 4": "Esplora strategie di investimento avanzate e considera di diventare un mentore per altri.",
+                "Categoria Speciale 2": "Sei pronto per strategie avanzate e per condividere le tue conoscenze con altri."
+            };
+            return suggestions[category];
+        }
+
+        function submitToGoogleSheets(score, category) {
+            // Sostituisci con l'URL del tuo Google Apps Script Web App
+            // Inserisci qui l'URL del tuo Google Script Web App che hai copiato dopo il deployment
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyh0TAWhXvS4wBJkgfbSLPXPuyjliNd1fIdWfuAQqxUtY1Vt-GGfHKfXanLrToQpYPm3w/exec';
+            
+            const formData = new FormData();
+            formData.append('score', score);
+            formData.append('category', category);
+            formData.append('timestamp', new Date().toISOString());
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => console.log('Success!', response))
+            .catch(error => console.error('Error!', error.message));
+        }
+
+        // Inizializza il form
+        createQuestions();
+
+        // Aggiorna la barra di progresso
+        const inputs = document.querySelectorAll('input[type="radio"]');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+                const progress = (answered / questions.length) * 100;
+                document.getElementById('progress').style.width = `${progress}%`;
+            });
+        });
+    </script>
+</body>
+</html>
